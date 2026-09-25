@@ -1,0 +1,13 @@
+# One request per line, as someone would type it on the Cardputer.
+# Deliberately mixed: widget UIs, real-time games, persistence, and requests
+# that bump into the platform's limits (no clock, no network, no sound).
+dice roller for tabletop games, pick d4 d6 d8 d10 d12 d20 and how many
+tally counter with 3 named counters that saves
+snake game
+pomodoro timer 25/5 with a session count
+todo list where I can add, check off and delete items, saved to sd
+flashcards quiz: spanish words, show word, reveal answer, keep score
+unit converter for length, weight and temperature
+2048 game
+reaction time tester
+stopwatch with lap times

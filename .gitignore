@@ -1,0 +1,7 @@
+vendor/
+out/
+sim/a512sim
+sim/micropython_embed/
+sim/build-embed/
+__pycache__/
+sim/prelude.py
