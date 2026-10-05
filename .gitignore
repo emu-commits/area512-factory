@@ -5,3 +5,8 @@ sim/micropython_embed/
 sim/build-embed/
 __pycache__/
 sim/prelude.py
+mpyc/a512c
+mpyc/mpconfigport.h
+mpyc/micropython_embed/
+mpyc/build-embed/
+emu/shots/

@@ -18,9 +18,41 @@ M5Launcher could do the same calls on-device and drop the app on the SD card.
     ./factory.py --sim out/<batch>/<app>                  # re-test after a hand edit
     ./factory.py --show-prompts                           # see exactly what is sent
 
-Each app lands in `out/<batch>/<app>/` (`main.py`, `README.md`, `spec.md`).
-Copy that folder to the SD card as `/home/ai/<app>/`, open `main.py` in AREA512
-(Enter compiles and runs it) — that is the real verdict.
+Each app lands in `out/<batch>/<app>/` (`main.mpy`, `main.py`, `README.md`, `spec.md`).
+Copy that folder to the SD card as `/home/ai/<app>/`, select it in Filer and
+press `R` (uppercase). `R` on a folder runs **only** `main.manifest`,
+`main.mrb` or `main.mpy` — never `main.py` — hence the `.mpy`.
+
+## main.mpy: the device's own compile, on the PC
+
+`mpyc/a512c` is AREA512's `.py → .mpy` step (Enter on a `.py`, or Filer `c`)
+built for the PC: same MicroPython source, AREA512's `mpconfigport.h`, and the
+same `mp_compile_to_raw_code` + `mp_raw_code_save` calls. The only addition is
+`MICROPY_DYNAMIC_COMPILER` set to 31-bit small ints (as mpy-cross does). Without
+it, a 64-bit PC writes 63 into header byte 3 and the device rejects the file
+with "incompatible .mpy file". Header is `4d 06 00 1f`.
+A plain `mpy-cross` would also load, but it compiles things the device cannot
+(slicing, f-strings…), so those failures would only show up at run time on the device.
+
+The simulator's verdict comes from running that **main.mpy** (loaded the way
+the device loads it). A failing run is repeated on main.py only for line numbers.
+
+## Ground truth without the hardware: the real firmware, headless
+
+`emu/fwrun.mjs` boots the official `Area512Adv.bin` in the emucard-adv
+ESP32-S3 emulator (vendor/emucard-adv, from github.com/emu-commits/emucard-adv)
+with the app on a fresh card, presses keys and saves screenshots:
+
+    node emu/fwrun.mjs out/<batch>/<app> --keys "j ENTER j R WAIT WAIT SHOT:start"
+    emu/fwbatch.py out/<batch>        # every app: launch, spec TEST 1, quit -> out/<batch>/firmware/*.png
+
+## Models we can't call over HTTP (a Claude subagent)
+
+    ./factory.py --batch requests.txt --export-prompts out/P   # system prompts + spec inputs
+    #   ...a fresh agent per input writes out/P/replies/NN.spec.txt
+    ./factory.py --batch requests.txt --export-prompts out/P   # now adds code inputs
+    #   ...a fresh agent per input writes out/P/replies/NN.code.txt
+    ./factory.py --batch requests.txt --replies out/P --model claude-sonnet-subagent
 
 ## What "pass" means
 

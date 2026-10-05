@@ -18,5 +18,9 @@ if [ ! -d vendor/micropython ]; then
   git -C vendor/micropython fetch -q --depth 1 origin "$MICROPYTHON_REV"
   git -C vendor/micropython checkout -q FETCH_HEAD
 fi
+if [ ! -d vendor/emucard-adv ]; then
+  git clone -q https://github.com/emu-commits/emucard-adv vendor/emucard-adv
+fi
 make -C sim setup
+make -C mpyc
 python3 sim/probe_features.py

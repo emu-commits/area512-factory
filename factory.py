@@ -38,6 +38,7 @@ SIG = HERE / "vendor/area512/components/area512/sig/micropython"
 LANDER = HERE / "vendor/area512/storage/home/game/space_lander"
 SIM = HERE / "sim/a512sim"
 PRELUDE = HERE / "sim/prelude.py"
+A512C = HERE / "mpyc/a512c"     # the device's own .py -> .mpy compile, on the PC
 OUT = HERE / "out"
 DEFAULT_MODEL = "anthropic/claude-sonnet-5"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -174,7 +175,43 @@ def api_key():
     return key
 
 
+REPLIES = None  # --replies DIR: read model replies from files instead of the API
+
+
+def system_text(messages):
+    return messages[0]["content"][0]["text"]
+
+
+def file_chat(messages):
+    """Offline backend for models we can't reach over HTTP (e.g. a Claude
+    subagent on the subscription). `--export-prompts DIR` writes the exact
+    system prompts and inputs; the model answers each in its own fresh context
+    into DIR/replies/<n>.spec.txt and <n>.code.txt; this reads them back.
+    Same prompts, same one-shot rule, same parser and simulator as the API."""
+    stage = "spec" if system_text(messages).startswith(SPEC_TASK) else "code"
+    user = messages[1]["content"].strip()
+    for inp in sorted((REPLIES / "inputs").glob("*.{}.in.txt".format(stage))):
+        if inp.read_text().strip() == user:
+            out = REPLIES / "replies" / inp.name.replace(".in.txt", ".txt")
+            if not out.exists():
+                raise RuntimeError("no reply yet: " + str(out))
+            text = out.read_text()
+            return {"text": text, "finish": "stop", "seconds": None,
+                    "response_bytes": len(text.encode()), "cost": 0, "model": "file:" + out.name}
+    raise RuntimeError("no {} input in {} matches this request".format(stage, REPLIES))
+
+
+def export_inputs(replies_dir, stage, numbered):
+    """Write inputs/<n>.<stage>.in.txt for each (n, text)."""
+    d = replies_dir / "inputs"
+    d.mkdir(parents=True, exist_ok=True)
+    for n, t in numbered:
+        (d / "{}.{}.in.txt".format(n, stage)).write_text(t.strip() + "\n")
+
+
 def chat(messages, model, effort):
+    if REPLIES:
+        return file_chat(messages)
     body = {"model": model, "messages": messages, "max_tokens": 32000,
             "usage": {"include": True}}
     if effort != "none":
@@ -240,11 +277,21 @@ def fuzz_script(seed):
     return " ".join(["ENTER"] + [rng.choice(FUZZ_TOKENS) for _ in range(150)] + ["ESC", "q", "ESC", "q"])
 
 
-def sim_run(app_dir, keys):
+def compile_mpy(app_dir):
+    """main.py -> main.mpy exactly as AREA512 compiles it. Folder apps launched
+    with Filer's `R` run main.mpy only (main.py alone = "No main.manifest,
+    main.mrb or main.mpy"). Returns "" on success, else the compiler's error."""
+    (app_dir / "main.mpy").unlink(missing_ok=True)
+    r = subprocess.run([str(A512C), "main.py", "main.mpy"], cwd=app_dir,
+                       capture_output=True, text=True, timeout=SIM_TIMEOUT_S)
+    return "" if r.returncode == 0 else (r.stderr.strip() or "a512c exit {}".format(r.returncode))
+
+
+def sim_run(app_dir, keys, target="main.mpy"):
     keys_file = app_dir / ".simkeys"
     keys_file.write_text(keys)
     try:
-        r = subprocess.run([str(SIM), str(PRELUDE), str(keys_file), str(SIM_HEAP_KB), "main.py"],
+        r = subprocess.run([str(SIM), str(PRELUDE), str(keys_file), str(SIM_HEAP_KB), target],
                            cwd=app_dir, capture_output=True, text=True, timeout=SIM_TIMEOUT_S)
         out = r.stdout + r.stderr
     except subprocess.TimeoutExpired:
@@ -271,6 +318,14 @@ def sim_run(app_dir, keys):
 
 
 def simulate(app_dir, tests):
+    """Verdict comes from the shipped main.mpy. The .mpy carries no line numbers
+    (device config), so a failing run is repeated on main.py for the detail."""
+    err = compile_mpy(app_dir)
+    if err:
+        # Same compiler, so the source run fails the same way, with a line number.
+        r = sim_run(app_dir, "q", "main.py")
+        r["detail"] = r["detail"] or err
+        return "compile_error", [r]
     runs = [sim_run(app_dir, t) for t in tests]
     runs.append(sim_run(app_dir, fuzz_script(app_dir.name)))
     runs[-1]["fuzz"] = True
@@ -278,6 +333,9 @@ def simulate(app_dir, tests):
     for r in runs:
         if r["result"] != "ok":
             verdict = r["result"]
+            src = sim_run(app_dir, r["keys"], "main.py")
+            if src["detail"]:
+                r["detail"] = src["detail"]
             break
     return verdict, runs
 
@@ -378,10 +436,18 @@ def main():
     ap.add_argument("--jobs", type=int, default=3)
     ap.add_argument("--sim", help="re-run the simulator on an existing app folder")
     ap.add_argument("--show-prompts", action="store_true")
+    ap.add_argument("--replies", metavar="DIR",
+                    help="offline model: take replies from DIR (see file_chat); use with --model NAME as a label")
+    ap.add_argument("--export-prompts", metavar="DIR",
+                    help="with --batch: write DIR/system.spec.txt + system.code.txt + inputs/<n>.spec.in.txt; "
+                         "after specs exist, run again to add inputs/<n>.code.in.txt")
     a = ap.parse_args()
+    global REPLIES
+    if a.replies:
+        REPLIES = pathlib.Path(a.replies).resolve()
 
-    if not SIM.exists() or not PRELUDE.exists():
-        sys.exit("build the simulator first: make -C sim setup")
+    if not SIM.exists() or not PRELUDE.exists() or not A512C.exists():
+        sys.exit("build the simulator and compiler first: ./setup.sh")
 
     if a.show_prompts:
         p = platform_block()
@@ -400,6 +466,21 @@ def main():
             if r.get("screen"):
                 print("   screen: " + " | ".join(r["screen"]))
         print("verdict:", verdict)
+        return
+
+    if a.export_prompts:
+        d = pathlib.Path(a.export_prompts)
+        d.mkdir(parents=True, exist_ok=True)
+        p = platform_block()
+        (d / "system.spec.txt").write_text(SPEC_TASK + "\n\n" + p)
+        (d / "system.code.txt").write_text(CODE_TASK + "\n\n" + p)
+        reqs = [l.strip() for l in pathlib.Path(a.batch).read_text().splitlines()
+                if l.strip() and not l.startswith("#")]
+        export_inputs(d, "spec", [("{:02d}".format(i), r) for i, r in enumerate(reqs, 1)])
+        specs = sorted((d / "replies").glob("*.spec.txt")) if (d / "replies").exists() else []
+        if specs:
+            export_inputs(d, "code", [(s.name.split(".")[0], s.read_text()) for s in specs])
+        print("exported {} spec inputs, {} code inputs to {}".format(len(reqs), len(specs), d))
         return
 
     if a.batch:
@@ -421,7 +502,7 @@ def main():
     recs = [f.result() for f in futs]
     print()
     print(write_report(batch_dir, recs))
-    print("\nfiles: {}\ncopy an app to the SD card as /home/ai/<app>/ (main.py + README.md)".format(batch_dir))
+    print("\nfiles: {}\ncopy an app folder to the SD card as /home/ai/<app>/ (main.mpy + main.py + README.md),\nselect the folder in Filer and press R".format(batch_dir))
 
 
 if __name__ == "__main__":

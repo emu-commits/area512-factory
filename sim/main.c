@@ -2,8 +2,9 @@
 // version and ROM level as the device. AREA512's hardware API is mocked in
 // Python (prelude.py, generated from AREA512's .pyi stubs).
 //
-// usage: a512sim <prelude.py> <keys-file> <heap-kb> <file.py>...
-//   Files are compiled first (all of them), then executed in order into one
+// usage: a512sim <prelude.py> <keys-file> <heap-kb> <file.py|file.mpy>...
+//   .mpy files (from mpyc/a512c) are loaded as the device loads them; .py
+//   files are compiled here, with line numbers. Files are compiled first (all of them), then executed in order into one
 //   shared globals dict -- the same as AREA512's main.manifest loader.
 //
 // Output protocol (stdout, one line each, parsed by factory.py):
@@ -20,8 +21,11 @@
 #include "py/compile.h"
 #include "py/gc.h"
 #include "py/lexer.h"
+#include "py/persistentcode.h"
 #include "py/runtime.h"
 #include "py/stackctrl.h"
+
+static size_t last_read_len;
 
 static char *read_file(const char *path) {
   FILE *f = fopen(path, "rb");
@@ -32,6 +36,7 @@ static char *read_file(const char *path) {
   char *buf = malloc((size_t)n + 1);
   if (fread(buf, 1, (size_t)n, f) != (size_t)n) { fclose(f); free(buf); return NULL; }
   buf[n] = '\0';
+  last_read_len = (size_t)n;
   fclose(f);
   return buf;
 }
@@ -44,6 +49,25 @@ static mp_obj_t compile_file(const char *path, const char *src) {
     mp_lexer_t *lex = mp_lexer_new_from_str_len(name, src, strlen(src), 0);
     mp_parse_tree_t tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
     mp_obj_t fun = mp_compile(&tree, name, false);
+    nlr_pop();
+    return fun;
+  }
+  printf("@@COMPILE_ERROR %s\n", path);
+  mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
+  return MP_OBJ_NULL;
+}
+
+// Load a .mpy the way AREA512's run_bytecode_file does (globals = the shared
+// dict), so the shipped artifact itself is what runs. MP_OBJ_NULL on error.
+static mp_obj_t load_mpy(const char *path, const char *bytes, size_t len) {
+  nlr_buf_t nlr;
+  if (nlr_push(&nlr) == 0) {
+    mp_module_context_t *ctx = m_new_obj(mp_module_context_t);
+    ctx->module.globals = mp_globals_get();
+    mp_compiled_module_t cm;
+    cm.context = ctx;
+    mp_raw_code_load_mem((const byte *)bytes, len, &cm);
+    mp_obj_t fun = mp_make_function_from_proto_fun(cm.rc, ctx, MP_OBJ_NULL);
     nlr_pop();
     return fun;
   }
@@ -134,7 +158,11 @@ int main(int argc, char **argv) {
   for (int i = 0; i < nfiles; i++) {
     char *src = read_file(argv[4 + i]);
     if (!src) { printf("@@COMPILE_ERROR %s\ncannot read file\n", argv[4 + i]); compile_failed = 1; continue; }
-    funs[i] = compile_file(argv[4 + i], src);
+    size_t len = strlen(argv[4 + i]);
+    if (len > 4 && strcmp(argv[4 + i] + len - 4, ".mpy") == 0)
+      funs[i] = load_mpy(argv[4 + i], src, last_read_len);
+    else
+      funs[i] = compile_file(argv[4 + i], src);
     free(src);
     if (funs[i] == MP_OBJ_NULL) compile_failed = 1;
   }
