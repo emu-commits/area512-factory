@@ -78,3 +78,7 @@ So a sim pass is necessary, not sufficient; the device run is the ground truth.
     prompts/skeleton.py   sim-verified example app
     sim/                  a512sim (C, embed port) + mock generator + feature probe
     requests.txt          10 sample requests
+
+## Examples
+
+[`examples/sonnet-subagent/`](examples/) — ten generated apps (`main.mpy` + source + spec) that run on the real AREA512 firmware, with screenshots and a model comparison table.

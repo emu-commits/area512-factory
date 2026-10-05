@@ -1,0 +1,809 @@
+[
+  {
+    "request": "dice roller for tabletop games, pick d4 d6 d8 d10 d12 d20 and how many",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 1962,
+        "cost": 0,
+        "model": "file:01.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 6105,
+        "cost": 0,
+        "model": "file:01.code.txt"
+      }
+    },
+    "app": "diceroller",
+    "lines": 174,
+    "bytes": 5489,
+    "notes": [],
+    "tests": [
+      "RIGHT RIGHT UP UP ENTER ENTER i ESC q",
+      "LEFT DOWN 5 RIGHT SPACE s i ESC 0 ENTER q"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "RIGHT RIGHT UP UP ENTER ENTER i ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=46 keys_used=9/9",
+        "screen": [
+          "DICE ROLLER",
+          "19",
+          "d4",
+          "d6",
+          "d8",
+          "d10",
+          "d12",
+          "d20",
+          "3d10",
+          "TOTAL: 19",
+          "L/R die  U/D count  ENTER roll  h hist  q quit"
+        ]
+      },
+      {
+        "keys": "LEFT DOWN 5 RIGHT SPACE s i ESC 0 ENTER q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=56 keys_used=11/11",
+        "screen": [
+          "DICE ROLLER",
+          "37",
+          "d4",
+          "d6",
+          "d8",
+          "d10",
+          "d12",
+          "d20",
+          "10d6",
+          "TOTAL: 37",
+          "L/R die  U/D count  ENTER roll  h hist  q quit"
+        ]
+      },
+      {
+        "keys": "ENTER s d 3 k 2 3 1 2 w d h k k w 2 j DOWN l ENTER ENTER SPACE d d w WAIT 3 UP k h d x 1 3 UP k x SPACE DOWN ENTER LEFT ENTER s d a UP RIGHT SPACE ENTER k w BS 1 3 SPACE LEFT RIGHT SPACE DOWN a d x x 2 3 w ENTER h 2 DOWN WAIT DOWN s d SPACE DOWN LEFT ENTER x d l WAIT ENTER j s j WAIT RIGHT 2 k j LEFT WAIT a x s d d RIGHT x 3 1 d WAIT 3 2 3 l WAIT RIGHT WAIT WAIT j h k 2 WAIT h h 1 x l BS j l WAIT SPACE a a a LEFT w 1 w UP RIGHT h d DOWN w SPACE w s x 3 BS ENTER a 3 h h ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=706 keys_used=152/155",
+        "screen": [
+          "DICE ROLLER",
+          "7",
+          "d4",
+          "d6",
+          "d8",
+          "d10",
+          "d12",
+          "d20",
+          "3d12",
+          "TOTAL: 7",
+          "L/R die  U/D count  ENTER roll  h hist  q quit"
+        ],
+        "fuzz": true
+      }
+    ]
+  },
+  {
+    "request": "tally counter with 3 named counters that saves",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 1941,
+        "cost": 0,
+        "model": "file:02.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 5609,
+        "cost": 0,
+        "model": "file:02.code.txt"
+      }
+    },
+    "app": "tally3",
+    "lines": 175,
+    "bytes": 5018,
+    "notes": [],
+    "tests": [
+      "DOWN ENTER ENTER ENTER UP ENTER BS q",
+      "3 ENTER r B O B ENTER ENTER z y UP ENTER q"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "DOWN ENTER ENTER ENTER UP ENTER BS q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=41 keys_used=8/8",
+        "screen": [
+          "TALLY",
+          "1/3",
+          "A",
+          "0",
+          "B",
+          "3",
+          "C",
+          "0",
+          "saved"
+        ]
+      },
+      {
+        "keys": "3 ENTER r B O B ENTER ENTER z y UP ENTER q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=41 keys_used=13/13",
+        "screen": [
+          "TALLY",
+          "2/3",
+          "A",
+          "0",
+          "B",
+          "1",
+          "CBOB",
+          "0",
+          "saved"
+        ]
+      },
+      {
+        "keys": "ENTER 1 d ENTER 2 l d x SPACE j SPACE h h DOWN LEFT w h ENTER RIGHT j l x 2 ENTER WAIT DOWN WAIT 3 x s s h WAIT BS WAIT WAIT RIGHT UP s DOWN a 3 1 k UP WAIT DOWN WAIT 2 BS x BS BS d j LEFT RIGHT WAIT x d 3 h WAIT a BS w 2 s RIGHT d LEFT x ENTER l d WAIT h WAIT BS BS w d SPACE l x j SPACE k LEFT WAIT ENTER j WAIT SPACE WAIT l h WAIT DOWN d ENTER s 1 3 BS BS 2 BS 1 k x l s UP DOWN k 1 k WAIT w UP h 2 SPACE x d a WAIT l l j 1 RIGHT h BS x w 2 d ENTER WAIT SPACE l 3 1 SPACE SPACE ENTER 3 ENTER 3 ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=671 keys_used=152/155",
+        "screen": [
+          "TALLY",
+          "3/3",
+          "A",
+          "5",
+          "B",
+          "6",
+          "C",
+          "2",
+          "saved"
+        ],
+        "fuzz": true
+      }
+    ]
+  },
+  {
+    "request": "snake game",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 2322,
+        "cost": 0,
+        "model": "file:03.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 7713,
+        "cost": 0,
+        "model": "file:03.code.txt"
+      }
+    },
+    "app": "snake",
+    "lines": 248,
+    "bytes": 7227,
+    "notes": [],
+    "tests": [
+      "ENTER WAIT WAIT WAIT WAIT WAIT WAIT RIGHT WAIT WAIT WAIT WAIT WAIT WAIT DOWN WAIT WAIT WAIT WAIT WAIT WAIT p WAIT p WAIT WAIT q",
+      "ENTER UP WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT ENTER WAIT q"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "ENTER WAIT WAIT WAIT WAIT WAIT WAIT RIGHT WAIT WAIT WAIT WAIT WAIT WAIT DOWN WAIT WAIT WAIT WAIT WAIT WAIT p WAIT p WAIT WAIT q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=133 keys_used=27/27",
+        "screen": [
+          "SNAKE",
+          "S:0",
+          "arrows/hjkl move  p pause  q quit"
+        ]
+      },
+      {
+        "keys": "ENTER UP WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT ENTER WAIT q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=385 keys_used=67/67",
+        "screen": [
+          "SNAKE",
+          "S:0",
+          "PAUSED",
+          "arrows/hjkl move  p pause  q quit"
+        ]
+      },
+      {
+        "keys": "ENTER BS j ENTER a WAIT 2 ENTER h ENTER SPACE l k WAIT RIGHT WAIT h UP WAIT UP DOWN 1 2 a d RIGHT DOWN WAIT h x BS w j a s x RIGHT h LEFT d s ENTER WAIT 1 1 DOWN ENTER a x ENTER h DOWN h UP 2 WAIT ENTER 3 LEFT 2 a j 2 UP x UP 2 j a s UP 1 j WAIT WAIT d l h BS ENTER d WAIT a l DOWN s SPACE 2 x LEFT DOWN a RIGHT a j a UP d a SPACE RIGHT ENTER s 2 UP l d d d WAIT WAIT h x l BS WAIT h LEFT RIGHT WAIT ENTER 1 1 SPACE UP 1 3 LEFT WAIT LEFT j l RIGHT BS UP BS UP BS WAIT RIGHT WAIT s d RIGHT w WAIT x x RIGHT d 1 ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=175 keys_used=154/155",
+        "screen": [
+          "SNAKE",
+          "S:0",
+          "PAUSED",
+          "arrows/hjkl move  p pause  q quit"
+        ],
+        "fuzz": true
+      }
+    ]
+  },
+  {
+    "request": "pomodoro timer 25/5 with a session count",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 1642,
+        "cost": 0,
+        "model": "file:04.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 4349,
+        "cost": 0,
+        "model": "file:04.code.txt"
+      }
+    },
+    "app": "pomodoro",
+    "lines": 135,
+    "bytes": 3818,
+    "notes": [],
+    "tests": [
+      "SPACE WAIT WAIT WAIT SPACE r q",
+      "SPACE n n n c y q"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "SPACE WAIT WAIT WAIT SPACE r q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=43 keys_used=7/7",
+        "screen": [
+          "POMODORO",
+          "#0",
+          "FOCUS (paused)",
+          "25:00",
+          "Sessions: 0",
+          "SPACE start/pause  n skip  r reset  q quit"
+        ]
+      },
+      {
+        "keys": "SPACE n n n c y q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=37 keys_used=7/7",
+        "screen": [
+          "POMODORO",
+          "#0",
+          "BREAK (paused)",
+          "05:00",
+          "Sessions: 0",
+          "SPACE start/pause  n skip  r reset  q quit"
+        ]
+      },
+      {
+        "keys": "ENTER s 1 WAIT x 2 a l 2 w WAIT j s l 2 DOWN k x SPACE l 2 w s ENTER j BS WAIT UP 1 l h DOWN DOWN 2 UP 2 WAIT j w s ENTER SPACE x RIGHT ENTER x w RIGHT k j DOWN d SPACE l k LEFT k BS j 2 BS w SPACE k ENTER w a DOWN UP 3 UP WAIT l h SPACE LEFT d LEFT WAIT j UP DOWN w DOWN h RIGHT j a d ENTER BS h k RIGHT l 3 h h SPACE j DOWN WAIT SPACE UP a DOWN d s x DOWN BS j w SPACE w WAIT l BS j SPACE a 2 WAIT 2 x 2 LEFT WAIT d WAIT k WAIT BS DOWN 1 1 s d BS 3 UP WAIT ENTER RIGHT WAIT s ENTER j x DOWN RIGHT ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=97 keys_used=16/155",
+        "screen": [
+          "POMODORO",
+          "#0",
+          "FOCUS (paused)",
+          "25:00",
+          "Sessions: 0",
+          "SPACE start/pause  n skip  r reset  q quit"
+        ],
+        "fuzz": true
+      }
+    ]
+  },
+  {
+    "request": "todo list where I can add, check off and delete items, saved to sd",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 2077,
+        "cost": 0,
+        "model": "file:05.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 5338,
+        "cost": 0,
+        "model": "file:05.code.txt"
+      }
+    },
+    "app": "todo",
+    "lines": 180,
+    "bytes": 4914,
+    "notes": [],
+    "tests": [
+      "a h i SPACE ENTER a m i l k ENTER SPACE DOWN SPACE UP d y q",
+      "a a ENTER a b ENTER a c ENTER DOWN SPACE j d y k a ESC c y q"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "a h i SPACE ENTER a m i l k ENTER SPACE DOWN SPACE UP d y q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=41 keys_used=18/18",
+        "screen": [
+          "TODO",
+          "0/1",
+          "deleted"
+        ]
+      },
+      {
+        "keys": "a a ENTER a b ENTER a c ENTER DOWN SPACE j d y k a ESC c y q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=61 keys_used=20/20",
+        "screen": [
+          "TODO",
+          "0/2",
+          "a add  SPACE check  d del  q quit"
+        ]
+      },
+      {
+        "keys": "ENTER s 1 2 j h h d LEFT 3 WAIT 3 s 2 ENTER UP w 1 WAIT w x h WAIT SPACE w ENTER WAIT DOWN 3 DOWN x 1 2 w x RIGHT k BS RIGHT 3 s l 3 h SPACE BS x k w WAIT h s WAIT WAIT d d 1 l SPACE SPACE w j DOWN s x ENTER LEFT k 1 3 BS a 2 d SPACE s j w w j SPACE LEFT RIGHT ENTER ENTER x BS 3 UP SPACE h d UP RIGHT j 3 LEFT w RIGHT k BS 2 WAIT UP SPACE w a l k 3 d k BS s a l UP 3 WAIT 3 BS SPACE SPACE d a 3 x SPACE w 2 UP WAIT WAIT 3 1 LEFT UP a DOWN 2 a BS UP RIGHT l ENTER 1 3 3 a 2 ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=446 keys_used=153/155",
+        "screen": [
+          "TODO",
+          "1/2",
+          "a add  SPACE check  d del  q quit"
+        ],
+        "fuzz": true
+      }
+    ]
+  },
+  {
+    "request": "flashcards quiz: spanish words, show word, reveal answer, keep score",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 2174,
+        "cost": 0,
+        "model": "file:06.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 6203,
+        "cost": 0,
+        "model": "file:06.code.txt"
+      }
+    },
+    "app": "spanish_cards",
+    "lines": 207,
+    "bytes": 5665,
+    "notes": [],
+    "tests": [
+      "SPACE y SPACE n SPACE y SPACE y SPACE n SPACE y SPACE n SPACE y SPACE y SPACE n SPACE y SPACE y r q",
+      "SPACE ENTER SPACE y LEFT SPACE n SPACE y WAIT DOWN SPACE n r SPACE y ESC"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "SPACE y SPACE n SPACE y SPACE y SPACE n SPACE y SPACE n SPACE y SPACE y SPACE n SPACE y SPACE y r q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=131 keys_used=26/26",
+        "screen": [
+          "SPANISH CARDS",
+          "1/12",
+          "nino",
+          "? press SPACE to reveal",
+          "Right 0  Miss 0",
+          "SPACE reveal  q quit"
+        ]
+      },
+      {
+        "keys": "SPACE ENTER SPACE y LEFT SPACE n SPACE y WAIT DOWN SPACE n r SPACE y ESC",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=81 keys_used=17/17",
+        "screen": [
+          "SPANISH CARDS",
+          "2/12",
+          "agua",
+          "? press SPACE to reveal",
+          "Right 1  Miss 0",
+          "SPACE reveal  q quit"
+        ]
+      },
+      {
+        "keys": "ENTER 2 1 j j h 1 a j 2 WAIT w 1 x LEFT s BS RIGHT 2 WAIT d j w LEFT UP d WAIT h WAIT BS WAIT ENTER a x l d s h RIGHT ENTER UP l k WAIT UP RIGHT 2 UP j l w j j LEFT w 1 WAIT a d RIGHT UP j 2 j x d l k w j x 2 BS RIGHT RIGHT k RIGHT j SPACE k x a d h ENTER BS WAIT RIGHT LEFT 3 x 3 DOWN l 2 1 l RIGHT 3 a UP 2 UP WAIT l s l WAIT LEFT j ENTER w ENTER DOWN WAIT h WAIT 2 SPACE WAIT a x 2 3 1 a BS 1 3 k x 3 BS RIGHT h h 2 ENTER a 2 w 3 ENTER h k s a l l SPACE s ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=696 keys_used=152/155",
+        "screen": [
+          "SPANISH CARDS",
+          "1/12",
+          "tiempo",
+          "time",
+          "Right 0  Miss 0",
+          "y knew it  n missed  q quit"
+        ],
+        "fuzz": true
+      }
+    ]
+  },
+  {
+    "request": "unit converter for length, weight and temperature",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 1957,
+        "cost": 0,
+        "model": "file:07.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 6511,
+        "cost": 0,
+        "model": "file:07.code.txt"
+      }
+    },
+    "app": "unitconv",
+    "lines": 218,
+    "bytes": 5851,
+    "notes": [],
+    "tests": [
+      "1 2 DOWN s ENTER q",
+      "RIGHT RIGHT 1 0 0 x UP LEFT BS BS c 5 . 5 q"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "1 2 DOWN s ENTER q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=31 keys_used=6/6",
+        "screen": [
+          "UNIT CONVERTER",
+          "LENGTH",
+          "From  cm: 12_",
+          "To    m: 0.12",
+          "cm -> m",
+          "saved",
+          "0-9 . - BS  UD from s to x swap c clr"
+        ]
+      },
+      {
+        "keys": "RIGHT RIGHT 1 0 0 x UP LEFT BS BS c 5 . 5 q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=76 keys_used=15/15",
+        "screen": [
+          "UNIT CONVERTER",
+          "WEIGHT",
+          "From  mg: 5.5_",
+          "To    g: 0.0055",
+          "mg -> g",
+          "0-9 . - BS  UD from s to x swap c clr"
+        ]
+      },
+      {
+        "keys": "ENTER RIGHT UP j a l BS BS h s j j k RIGHT UP SPACE ENTER d d d DOWN j DOWN l 3 l h k WAIT w SPACE x w 1 WAIT h k d l w SPACE DOWN 2 UP w k j a DOWN SPACE 3 UP x x a w WAIT WAIT d a h DOWN RIGHT 2 x BS j d BS 2 BS x x 3 j l k j BS a DOWN RIGHT DOWN BS DOWN x l RIGHT RIGHT WAIT UP d LEFT s 3 ENTER ENTER h 1 x h l WAIT h ENTER ENTER j UP j DOWN 2 SPACE a 1 3 1 SPACE 2 1 UP SPACE s l x l 2 BS w 1 2 1 UP UP k 2 ENTER l 3 WAIT SPACE SPACE BS BS LEFT h UP l j DOWN WAIT 2 ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=721 keys_used=152/155",
+        "screen": [
+          "UNIT CONVERTER",
+          "WEIGHT",
+          "From  kg: 313121312_",
+          "To    g: 313121312000",
+          "kg -> g",
+          "saved",
+          "0-9 . - BS  UD from s to x swap c clr"
+        ],
+        "fuzz": true
+      }
+    ]
+  },
+  {
+    "request": "2048 game",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 2394,
+        "cost": 0,
+        "model": "file:08.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 7340,
+        "cost": 0,
+        "model": "file:08.code.txt"
+      }
+    },
+    "app": "game2048",
+    "lines": 241,
+    "bytes": 6972,
+    "notes": [],
+    "tests": [
+      "LEFT UP RIGHT DOWN LEFT UP RIGHT DOWN h j k l LEFT LEFT UP UP",
+      "LEFT DOWN n ENTER LEFT UP RIGHT DOWN ESC q"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "LEFT UP RIGHT DOWN LEFT UP RIGHT DOWN h j k l LEFT LEFT UP UP",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=86 keys_used=16/16",
+        "screen": [
+          "2048",
+          "S 44",
+          "4",
+          "8",
+          "4",
+          "2",
+          "8",
+          "",
+          "",
+          "",
+          "4",
+          "",
+          "",
+          "",
+          "2",
+          "",
+          "",
+          "",
+          "SCORE",
+          "44",
+          "BEST",
+          "44",
+          "MOVES",
+          "14",
+          "arrows/hjkl move  n new  q quit"
+        ]
+      },
+      {
+        "keys": "LEFT DOWN n ENTER LEFT UP RIGHT DOWN ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=46 keys_used=9/10",
+        "screen": [
+          "2048",
+          "S 16",
+          "",
+          "",
+          "",
+          "",
+          "2",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "2",
+          "",
+          "",
+          "8",
+          "SCORE",
+          "16",
+          "BEST",
+          "16",
+          "MOVES",
+          "4",
+          "arrows/hjkl move  n new  q quit"
+        ]
+      },
+      {
+        "keys": "ENTER 1 a 1 a a w 3 DOWN ENTER RIGHT 2 BS 3 WAIT s WAIT RIGHT l 2 WAIT d a j 1 j s 1 SPACE j h j 1 3 RIGHT RIGHT h 2 WAIT DOWN WAIT 1 w 1 BS j d w 1 d j ENTER d LEFT 1 WAIT LEFT SPACE w WAIT l DOWN 2 j RIGHT WAIT k BS a d w 1 UP 2 s WAIT j WAIT j l k 3 WAIT x WAIT DOWN 2 3 j DOWN d DOWN 1 j WAIT k s w k d j ENTER UP k 2 UP w h SPACE 2 SPACE LEFT 3 j ENTER a RIGHT RIGHT j DOWN 3 3 RIGHT 1 LEFT DOWN LEFT a 3 j h h l BS w DOWN j 1 WAIT 2 x h s l ENTER 3 3 ENTER 2 LEFT x ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=691 keys_used=152/155",
+        "screen": [
+          "2048",
+          "S 288",
+          "4",
+          "",
+          "",
+          "",
+          "8",
+          "",
+          "2",
+          "",
+          "4",
+          "32",
+          "",
+          "",
+          "2",
+          "4",
+          "32",
+          "4",
+          "SCORE",
+          "288",
+          "BEST",
+          "288",
+          "MOVES",
+          "44",
+          "arrows/hjkl move  n new  q quit"
+        ],
+        "fuzz": true
+      }
+    ]
+  },
+  {
+    "request": "reaction time tester",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 2591,
+        "cost": 0,
+        "model": "file:09.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 7370,
+        "cost": 0,
+        "model": "file:09.code.txt"
+      }
+    },
+    "app": "reaction",
+    "lines": 224,
+    "bytes": 6837,
+    "notes": [],
+    "tests": [
+      "SPACE WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT SPACE q",
+      "SPACE SPACE SPACE q"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "SPACE WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT WAIT SPACE q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=131 keys_used=116/116",
+        "screen": [
+          "REACTION TEST",
+          "best --",
+          "Round 1: 360 ms",
+          "SPACE next  q quit"
+        ]
+      },
+      {
+        "keys": "SPACE SPACE SPACE q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=19 keys_used=4/4",
+        "screen": [
+          "REACTION TEST",
+          "best --",
+          "WAIT...",
+          "Round 1/5",
+          "press SPACE when green"
+        ]
+      },
+      {
+        "keys": "ENTER ENTER k k d DOWN 3 SPACE WAIT d ENTER l k WAIT l 2 w ENTER SPACE WAIT WAIT WAIT d w k UP s j WAIT x l RIGHT LEFT l WAIT w 3 w a LEFT h SPACE WAIT BS x SPACE k s d WAIT WAIT RIGHT ENTER SPACE BS SPACE DOWN UP RIGHT DOWN s 3 a LEFT w l UP a 1 l h 2 a 3 3 LEFT SPACE LEFT w 1 l UP j x d WAIT LEFT k s WAIT j h RIGHT x l WAIT SPACE 1 WAIT ENTER 3 l s ENTER 3 j h x s 1 h SPACE 1 LEFT s 3 x w 2 WAIT w RIGHT DOWN RIGHT h DOWN WAIT UP RIGHT d s k RIGHT x k x l 1 UP k k a 2 DOWN 2 SPACE k h BS j s ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=16 keys_used=6/155",
+        "screen": [
+          "REACTION TEST",
+          "best --",
+          "Too early!",
+          "SPACE next  q quit"
+        ],
+        "fuzz": true
+      }
+    ]
+  },
+  {
+    "request": "stopwatch with lap times",
+    "model": "claude-sonnet-subagent",
+    "effort": "medium",
+    "calls": {
+      "spec": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 1656,
+        "cost": 0,
+        "model": "file:10.spec.txt"
+      },
+      "code": {
+        "finish": "stop",
+        "seconds": null,
+        "response_bytes": 6811,
+        "cost": 0,
+        "model": "file:10.code.txt"
+      }
+    },
+    "app": "stopwatch",
+    "lines": 223,
+    "bytes": 6290,
+    "notes": [],
+    "tests": [
+      "SPACE WAIT WAIT WAIT l WAIT WAIT l WAIT SPACE h DOWN ESC r q",
+      "SPACE WAIT l WAIT l WAIT l WAIT l WAIT l SPACE s h UP ESC q"
+    ],
+    "verdict": "pass",
+    "runs": [
+      {
+        "keys": "SPACE WAIT WAIT WAIT l WAIT WAIT l WAIT SPACE h DOWN ESC r q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=86 keys_used=15/15",
+        "screen": [
+          "LAPS",
+          "2",
+          "UP/DOWN scroll  ESC back",
+          "saved 00:00.03"
+        ]
+      },
+      {
+        "keys": "SPACE WAIT l WAIT l WAIT l WAIT l WAIT l SPACE s h UP ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=98 keys_used=17/17",
+        "screen": [
+          "LAPS",
+          "5",
+          "UP/DOWN scroll  ESC back",
+          "saved 00:00.02"
+        ]
+      },
+      {
+        "keys": "ENTER ENTER j WAIT WAIT LEFT 3 k l DOWN RIGHT h WAIT DOWN UP ENTER LEFT UP h 3 s a d j k UP DOWN 3 x x WAIT j UP RIGHT WAIT WAIT w LEFT x 1 SPACE UP ENTER UP a x w 3 k x RIGHT x k LEFT 3 WAIT DOWN h RIGHT d 3 x k 3 1 LEFT RIGHT DOWN UP a RIGHT k LEFT ENTER x s ENTER k k ENTER h WAIT SPACE LEFT j w ENTER BS d DOWN j w 3 ENTER j RIGHT j k a DOWN BS s ENTER 1 UP j d j WAIT 3 1 UP j x 1 LEFT WAIT WAIT SPACE WAIT DOWN WAIT x s d s d s l j BS 3 x SPACE a l WAIT 2 h 3 WAIT BS SPACE 2 k UP a l d LEFT RIGHT ESC q ESC q",
+        "result": "ok",
+        "detail": "",
+        "stats": "frames=608 keys_used=122/155",
+        "screen": [
+          "STOPWATCH",
+          "RUN",
+          "00:00.03",
+          "no laps yet",
+          "SPACE start/stop  l lap  r reset  q quit"
+        ],
+        "fuzz": true
+      }
+    ]
+  }
+]
