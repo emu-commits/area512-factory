@@ -1,7 +1,7 @@
 // fwrun: run an app on the REAL AREA512 firmware (official Area512Adv.bin) inside the
 // emucard-adv ESP32-S3 emulator, headless. Ground truth for "does main.mpy run".
 //
-//   node emu/fwrun.mjs <app-dir>... [--keys "<script>"] [--out DIR] [--fw Area512Adv.bin]
+//   node emu/fwrun.mjs <app-dir>... [--keys "<script>"] [--out DIR] [--fw Area512Adv.bin] [--dump DIR]
 //
 // Each app dir is copied to /Area512_data/home/ai/<name>/ on a fresh card, then driven by a
 // script of steps: plain characters type, and these tokens are special:
@@ -23,6 +23,7 @@ const opt = (k, d) => { const i = args.indexOf(k); if (i < 0) return d; const v 
 const outDir = opt('--out', 'emu/shots');
 const fwPath = opt('--fw', null);
 const keysArg = opt('--keys', null);
+const dumpDir = opt('--dump', null);   // copy /Area512_data/data from the card here afterwards
 const apps = args;
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -91,9 +92,10 @@ async function runApp(fw, appDirs, script, tag) {
     const name = path.basename(path.resolve(dir));
     const dst = '/Area512_data/home/ai/' + name;
     vol.mkdir(dst);
-    for (const f of ['main.mpy', 'main.py', 'README.md']) {
+    // every plain file in the app folder (main.mpy, or main.manifest + its .mpy entries, README...)
+    for (const f of fs.readdirSync(dir)) {
       const src = path.join(dir, f);
-      if (fs.existsSync(src)) vol.writeFile(dst + '/' + f, new Uint8Array(fs.readFileSync(src)));
+      if (fs.statSync(src).isFile()) vol.writeFile(dst + '/' + f, new Uint8Array(fs.readFileSync(src)));
     }
   }
   ok('rom', withBytes(fs.readFileSync(new URL('vendor/esp32s3_rev0_rom.elf', EMU)), (p, n) => wasm.esp32sim_load(emu, 0, p, n)));
@@ -139,6 +141,18 @@ async function runApp(fw, appDirs, script, tag) {
       const k = charKey.get(ch);
       if (!k) throw new Error('no key for ' + ch);
       tap(k[0], k[1] ? [CODE.Shift] : []);
+    }
+  }
+  if (dumpDir) {
+    // The firmware's writes live in the emulator's card image; read it back with the same FAT code.
+    const len = wasm.esp32sim_sd_len(emu);
+    const card = new FatVolume(mem().slice(wasm.esp32sim_sd_ptr(emu), wasm.esp32sim_sd_ptr(emu) + len));
+    if (card.exists('/Area512_data/data')) {
+      for (const e of card.walk('/Area512_data/data')) {
+        const dst = path.join(dumpDir, e.path.replace('/Area512_data/', ''));
+        if (e.isDir) fs.mkdirSync(dst, { recursive: true });
+        else { fs.mkdirSync(path.dirname(dst), { recursive: true }); fs.writeFileSync(dst, card.readFile(e.path)); }
+      }
     }
   }
   return { serial, shots };
