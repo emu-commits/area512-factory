@@ -92,11 +92,15 @@ async function runApp(fw, appDirs, script, tag) {
     const name = path.basename(path.resolve(dir));
     const dst = '/Area512_data/home/ai/' + name;
     vol.mkdir(dst);
-    // every plain file in the app folder (main.mpy, or main.manifest + its .mpy entries, README...)
-    for (const f of fs.readdirSync(dir)) {
-      const src = path.join(dir, f);
-      if (fs.statSync(src).isFile()) vol.writeFile(dst + '/' + f, new Uint8Array(fs.readFileSync(src)));
-    }
+    // the whole app folder, subfolders included (main.mpy, or main.manifest + its entries, data...)
+    const copy = (from, to) => {
+      for (const f of fs.readdirSync(from)) {
+        const src = path.join(from, f);
+        if (fs.statSync(src).isDirectory()) { vol.mkdir(to + '/' + f); copy(src, to + '/' + f); }
+        else vol.writeFile(to + '/' + f, new Uint8Array(fs.readFileSync(src)));
+      }
+    };
+    copy(dir, dst);
   }
   ok('rom', withBytes(fs.readFileSync(new URL('vendor/esp32s3_rev0_rom.elf', EMU)), (p, n) => wasm.esp32sim_load(emu, 0, p, n)));
   ok('firmware', withBytes(fw, (p, n) => wasm.esp32sim_load(emu, 5, p, n)));
