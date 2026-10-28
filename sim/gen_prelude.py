@@ -197,6 +197,8 @@ def _sim_key_blocking(block):
             return None
         if t == "SPACE":
             return " "
+        if t == "TAB":
+            return "\t"
         return t
     if block:
         raise _SimDone("keys_exhausted")
