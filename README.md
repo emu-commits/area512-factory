@@ -46,6 +46,13 @@ with the app on a fresh card, presses keys and saves screenshots:
     node emu/fwrun.mjs out/<batch>/<app> --keys "j ENTER j R WAIT WAIT SHOT:start"
     emu/fwbatch.py out/<batch>        # every app: launch, spec TEST 1, quit -> out/<batch>/firmware/*.png
 
+**TERM512.** `--fw vendor/Area512TFT7789.bin` (a TERM512 build of AREA512; `fwrun` takes any
+whole flash image) boots with the 320×240 lid screen, and every `SHOT:` is that screen once the
+firmware has drawn on it (`--screen lcd` for the Cardputer's own). `TAB` presses Tab, and
+`--seed DIR` copies DIR onto the card as `/Area512_data` first (an app's data, `/etc/ui`).
+The TERM512 build isn't in a release yet: build it from AREA512 `main` with
+`AREA512_EXT_DISPLAY` (fc9f6f9 or later) and put it in `vendor/`.
+
 ## Models we can't call over HTTP (a Claude subagent)
 
     ./factory.py --batch requests.txt --export-prompts out/P   # system prompts + spec inputs

@@ -2,11 +2,14 @@
 // emucard-adv ESP32-S3 emulator, headless. Ground truth for "does main.mpy run".
 //
 //   node emu/fwrun.mjs <app-dir>... [--keys "<script>"] [--out DIR] [--fw Area512Adv.bin] [--dump DIR]
+//                      [--seed DIR] [--screen ext|lcd]
 //
 // Each app dir is copied to /Area512_data/home/ai/<name>/ on a fresh card, then driven by a
 // script of steps: plain characters type, and these tokens are special:
-//   ENTER ESC BS SPACE UP DOWN LEFT RIGHT   keys      R / Q ...  uppercase = shift+letter
+//   ENTER ESC BS SPACE TAB UP DOWN LEFT RIGHT   keys      R / Q ...  uppercase = shift+letter
 //   WAIT  ~0.25 s idle      SHOT:<name>  screenshot to <out>/<name>.png
+// With a TERM512 build (--fw Area512TFT7789.bin or Area512TFT9341.bin) a shot is the 320x240
+// lid screen, once the firmware has drawn on it; --screen lcd takes the Cardputer's own instead.
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
@@ -24,6 +27,8 @@ const outDir = opt('--out', 'emu/shots');
 const fwPath = opt('--fw', null);
 const keysArg = opt('--keys', null);
 const dumpDir = opt('--dump', null);   // copy /Area512_data/data from the card here afterwards
+const screen = opt('--screen', 'ext');  // ext: the TERM512 panel when there is one
+const seedDir = opt('--seed', null);    // copied onto the card as /Area512_data (data, settings)
 const apps = args;
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -88,6 +93,14 @@ async function runApp(fw, appDirs, script, tag) {
   const img = formatImage(64 * 1024 * 1024);
   const vol = new FatVolume(img);
   for (const p of ['/Area512_data', '/Area512_data/home', '/Area512_data/home/ai']) if (!vol.exists(p)) vol.mkdir(p);
+  const copyIn = (from, to) => {
+    for (const f of fs.readdirSync(from)) {
+      const src = path.join(from, f), dst = to + '/' + f;
+      if (fs.statSync(src).isDirectory()) { if (!vol.exists(dst)) vol.mkdir(dst); copyIn(src, dst); }
+      else vol.writeFile(dst, new Uint8Array(fs.readFileSync(src)));
+    }
+  };
+  if (seedDir) copyIn(seedDir, '/Area512_data');
   for (const dir of appDirs) {
     const name = path.basename(path.resolve(dir));
     const dst = '/Area512_data/home/ai/' + name;
@@ -108,7 +121,7 @@ async function runApp(fw, appDirs, script, tag) {
   ok('boot', wasm.esp32sim_boot(emu, 0));
 
   const hz = wasm.esp32sim_cpu_hz(emu);
-  let serial = '', frame = null, t = 0;
+  let serial = '', frame = null, ext = null, t = 0;
   const run = (secs) => {
     t += secs;
     while (wasm.esp32sim_cycles(emu) < t * hz) {
@@ -120,6 +133,7 @@ async function runApp(fw, appDirs, script, tag) {
           const m = JSON.parse(dec.decode(mem().subarray(p, p + len)));
           if (m.t === 'serial') serial += m.data;
         } else if (mem()[p] === 1) frame = mem().slice(p, p + len);
+        else if (mem()[p] === 5) ext = mem().slice(p, p + len);   // 5: TERM512 panel
       }
     }
   };
@@ -134,11 +148,13 @@ async function runApp(fw, appDirs, script, tag) {
   for (const tok of script.split(/\s+/).filter(Boolean)) {
     if (tok.startsWith('SHOT:')) {
       const f = path.join(outDir, `${tag}-${tok.slice(5)}.png`);
-      if (frame) { fs.writeFileSync(f, png(frame)); shots.push(f); }
+      const shot = screen === 'ext' && ext ? ext : frame;
+      if (shot) { fs.writeFileSync(f, png(shot)); shots.push(f); }
     } else if (tok === 'WAIT') run(0.25);
     else if (tok === 'ENTER') tap(CODE.Enter);
     else if (tok === 'BS') tap(CODE.Backspace);
     else if (tok === 'SPACE') tap(CODE.Space);
+    else if (tok === 'TAB') tap(CODE.Tab);
     else if (tok === 'ESC') tap(charKey.get('`')[0]);
     else if (FN_ARROWS[tok]) tap(charKey.get(FN_ARROWS[tok])[0], [CODE.Fn]);
     else for (const ch of tok) {
