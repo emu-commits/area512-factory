@@ -1,11 +1,11 @@
 #!/bin/sh
 # Fetch the pinned AREA512 + MicroPython sources and build the simulator.
-# Pins: AREA512 5d0fef9 (2026-09-23), whose components/micropython submodule is
+# Pins: AREA512 fc9f6f9 (2026-10-28: full screen, run_next), whose components/micropython submodule is
 # micropython e0e9fbb (v1.28.0). Bump both together, then re-run
 # sim/probe_features.py: prompts/rules.md is only true for this pair.
 set -e
 cd "$(dirname "$0")"
-AREA512_REV=5d0fef9
+AREA512_REV=fc9f6f9
 MICROPYTHON_REV=e0e9fbb17ed6fd06bb76e266ae554784c9c80804
 mkdir -p vendor
 if [ ! -d vendor/area512 ]; then

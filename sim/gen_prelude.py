@@ -20,26 +20,37 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 SIG = HERE.parent / "vendor/area512/components/area512/sig/micropython"
 STUBS = ["Sprite", "BandedSprite", "Widget", "WidgetList", "WidgetTextView",
-         "Dot", "SD", "RNG", "GPIO", "ADC", "IO", "Console"]
+         "Dot", "SD", "RNG", "GPIO", "ADC", "IO", "Console", "Area512"]
+
+# One prelude per screen: app window w, h, then the whole display w, h.
+# TERM512 (the AREA512_EXT_DISPLAY builds) runs each app in a 240x135 window on a
+# 320x240 display until it calls Display.full_screen() (AREA512 MicroPython.md).
+SCREENS = {"prelude.py": (240, 135, 240, 135),
+           "prelude_term512.py": (240, 135, 320, 240)}
 
 # Method bodies that need behaviour, keyed "Class.method". `a` is the tuple of
 # positional args (self excluded), already arity- and type-checked.
 BEHAVIOUR = {
-    # --- screen: 240x135 is the Cardputer panel (AREA512 README) ---
-    "Display.width": "return 240",
-    "Display.height": "return 135",
+    # --- screen: 240x135 is the Cardputer panel (AREA512 README); see SCREENS ---
+    "Display.width": "return _sim_scr[0]",
+    "Display.height": "return _sim_scr[1]",
+    "Display.screen_width": "return _sim_scr[2]",
+    "Display.screen_height": "return _sim_scr[3]",
+    "Display.full_screen": "_sim_scr[0] = _sim_scr[2]\n_sim_scr[1] = _sim_scr[3]",
     "Sprite.__init__": "self._w = a[0]\nself._h = a[1]\n_sim_live.append(self)",
     "Sprite.width": "return self._w",
     "Sprite.height": "return self._h",
     "Sprite.delete": "_sim_live.remove(self) if self in _sim_live else None",
-    "BandedSprite.__init__": "self._band = 0\n_sim_live.append(self)",
-    "BandedSprite.width": "return 240",
-    "BandedSprite.height": "return 135",
+    "BandedSprite.__init__": "self._band = 0\nself._w = _sim_scr[0]\nself._h = _sim_scr[1]\n"
+                             "_sim_live.append(self)",
+    "BandedSprite.width": "return self._w",
+    "BandedSprite.height": "return self._h",
     "BandedSprite.delete": "_sim_live.remove(self) if self in _sim_live else None",
     # draw() returns True once per band, then False after the final transfer.
-    # ASSUMPTION: 4 bands per frame.
+    # ASSUMPTION: 34-row bands (4 per frame at 135 rows, 8 at 240).
     "BandedSprite.draw": "_sim_frame()\nself._band = self._band + 1\n"
-                         "if self._band > 4:\n    self._band = 0\n    return False\nreturn True",
+                         "if self._band > (self._h + 33) // 34:\n    self._band = 0\n    return False\n"
+                         "return True",
     "BandedSprite.region_top": "return (self._band - 1) * 34 if self._band > 0 else 0",
     "BandedSprite.region_bottom": "return self._band * 34 if self._band > 0 else 34",
     "Sprite.push": "_sim_frame()",
@@ -71,7 +82,7 @@ BEHAVIOUR = {
     # ASSUMPTION: metrics for the default font; only used for layout arithmetic.
     "Widget.char_width": "return 6", "Widget.row_height": "return 11",
     "Widget.header_height": "return 13", "Widget.body_top": "return 14",
-    "Widget.body_bottom": "return 122", "Widget.body_height": "return 108",
+    "Widget.body_bottom": "return _sim_scr[1] - 13", "Widget.body_height": "return _sim_scr[1] - 27",
     "Widget.text_width": "return 6 * len(a[1])",
     "Widget.clip": "return a[1]",
     "Widget.wrap_text": "return a[2] + 11",
@@ -122,6 +133,8 @@ BEHAVIOUR = {
     "Dir.exist": "return a[0] in _sim_fs and _sim_fs[a[0]] is None",
     "Dir.mkdir": "_sim_fs[a[0]] = None\nreturn 0",
     "Dot.load": "return Dot()",
+    # --- hand-off: the filer runs the path once the app returns ---
+    "Area512.run_next": "print('@@RUN_NEXT ' + a[0])",
     # --- misc ---
     "RNG.random_int": "return _sim_rand()",
     "RNG.random_string": "return b'x' * a[0]",
@@ -150,7 +163,7 @@ _sim_tokens = _sim_keys.split()
 _sim_pos = [0]
 _sim_idle = [0]
 _SIM_IDLE_LIMIT = 300      # empty polls allowed after the key script ends
-_SIM_FRAME_LIMIT = 20000   # frames without ever finishing -> stop, not a failure
+_SIM_FRAME_LIMIT = 40000   # frames without ever finishing -> stop, not a failure
 
 _sim_cur = []
 _sim_last = []
@@ -363,8 +376,11 @@ def main():
         out.append("")
     out.append("#@@CHUNK")
     out.append(PRELUDE_TAIL)
-    (HERE / "prelude.py").write_text("\n".join(out))
-    print("wrote prelude.py: {} classes".format(len(classes)), file=sys.stderr)
+    for name, scr in SCREENS.items():
+        text = "\n".join(out) + "\n_sim_scr = [{}, {}, {}, {}]\n".format(*scr)
+        (HERE / name).write_text(text)
+        print("wrote {}: {} classes, {}x{} on {}x{}".format(name, len(classes), *scr),
+              file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -64,6 +64,10 @@ syntax the device can't compile (slicing, f-strings…), missing builtins
 counts, keyword args to builtins, floats passed as ints, and crashes along the
 spec's TEST key scripts plus a 150-key random fuzz.
 
+`sim/prelude_term512.py` is the same mocks on TERM512 (the `AREA512_EXT_DISPLAY` builds): the
+app starts in a 240×135 window on a 320×240 display and gets the whole display after
+`Display.full_screen()`. `Area512.run_next(path)` prints `@@RUN_NEXT path`.
+
 It does **not** see: how the screen looks, device-only memory pressure (the
 sim gives the app 96 KB and no heap growth), timing, or mock behaviour that
 differs from the real API (assumptions are marked in `sim/gen_prelude.py`).

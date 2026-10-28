@@ -12,11 +12,11 @@ $(EMBED): mpconfigport.h
 	$(MAKE) -f embed.mk
 
 # Everything the factory needs: the embed package, the binary, the mocks.
-setup: $(EMBED) prelude.py
+setup: $(EMBED) prelude.py prelude_term512.py
 	$(MAKE) a512sim
 
-prelude.py: gen_prelude.py
+prelude.py prelude_term512.py: gen_prelude.py
 	python3 gen_prelude.py
 
 clean:
-	rm -rf a512sim prelude.py $(EMBED) build-embed
+	rm -rf a512sim prelude.py prelude_term512.py $(EMBED) build-embed
