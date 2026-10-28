@@ -122,8 +122,14 @@ async function runApp(fw, appDirs, script, tag) {
 
   const hz = wasm.esp32sim_cpu_hz(emu);
   let serial = '', frame = null, ext = null, t = 0;
+  let nextStat = 0;
   const run = (secs) => {
     t += secs;
+    if (process.env.FWRUN_STATS && t >= nextStat) {      // memory of this process, to find leaks
+      nextStat = t + 10;
+      const m = process.memoryUsage();
+      console.error(`t=${t.toFixed(0)}s heap=${(m.heapUsed >> 20)}MB ext=${(m.external >> 20)}MB ab=${(m.arrayBuffers >> 20)}MB jit=${JSON.stringify(jit.stats)}`);
+    }
     while (wasm.esp32sim_cycles(emu) < t * hz) {
       if (wasm.esp32sim_run(emu, 4_000_000, Date.now()) !== 0) throw new Error('chip stopped');
       const n = wasm.esp32sim_out_take(emu);
@@ -131,7 +137,10 @@ async function runApp(fw, appDirs, script, tag) {
         const p = wasm.esp32sim_out_ptr(emu, i), len = wasm.esp32sim_out_len(emu, i);
         if (wasm.esp32sim_out_kind(emu, i) === 1) {
           const m = JSON.parse(dec.decode(mem().subarray(p, p + len)));
-          if (m.t === 'serial') serial += m.data;
+          if (m.t === 'serial') {
+            serial += m.data;
+            if (serial.length > 1 << 20) serial = serial.slice(-(1 << 19));   // a long run logs a lot
+          }
         } else if (mem()[p] === 1) frame = mem().slice(p, p + len);
         else if (mem()[p] === 5) ext = mem().slice(p, p + len);   // 5: TERM512 panel
       }

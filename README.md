@@ -53,6 +53,9 @@ firmware has drawn on it (`--screen lcd` for the Cardputer's own). `TAB` presses
 The TERM512 build isn't in a release yet: build it from AREA512 `main` with
 `AREA512_EXT_DISPLAY` (fc9f6f9 or later) and put it in `vendor/`.
 
+A long script needs `node --max-old-space-size=6144`: the emulator keeps thousands of compiled
+code blocks alive, and the JS heap passes Node's 2 GB default (`FWRUN_STATS=1` prints it).
+
 ## Models we can't call over HTTP (a Claude subagent)
 
     ./factory.py --batch requests.txt --export-prompts out/P   # system prompts + spec inputs
